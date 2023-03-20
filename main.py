@@ -15,7 +15,7 @@ h = 720  # set this
 model = YOLO("datasets/FromRoboflow/best.pt")
 
 hwnd = None
-hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.670 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
+# hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.670 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
 
 
 def screenshot(result_raw, result_shared):
