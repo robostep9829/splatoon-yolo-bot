@@ -54,10 +54,10 @@ def screenshot(result_raw, result_shared):
 
 def readData(result_raw, result_shared):
     gamepad = vg.VX360Gamepad()
-    time.sleep(1)
+    time.sleep(4)
     while True:
-        # print(result_raw['main'][0].boxes.xywhn.tolist())
-        if result_raw['main'][0].boxes.xywhn.tolist():
+        #print(result_raw['main'][0].boxes.xywhn.tolist()[1])
+        if result_raw['main'][0].boxes.xywhn != []:
             for index in result_raw['main'][0].boxes.xywhn.tolist():
                 if not (math.isclose(index[0], 0.5, abs_tol=0.08) and math.isclose(index[1], 0.8, abs_tol=0.08)):
                     gamepad.right_joystick_float(*stickDirection(index[0], index[1]))
