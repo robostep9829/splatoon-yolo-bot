@@ -15,7 +15,7 @@ h = 720  # set this
 model = YOLO("datasets/FromRoboflow/best.pt")
 
 hwnd = None
-# hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.670 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
+hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.677 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
 
 
 def screenshot(result_raw, result_shared):
@@ -54,13 +54,14 @@ def screenshot(result_raw, result_shared):
 
 def readData(result_raw, result_shared):
     gamepad = vg.VX360Gamepad()
-    time.sleep(1)
     while True:
-        #print(result_raw['main'][0].boxes.xywhn.tolist()[1])
+        print(result_raw['main'][0].boxes.xywhn.tolist())
         if result_raw['main'][0].boxes.xywhn != []:
             for index in result_raw['main'][0].boxes.xywhn.tolist():
-                if not (math.isclose(index[0], 0.5, abs_tol=0.08) and math.isclose(index[1], 0.8, abs_tol=0.08)):
+                if not (math.isclose(index[0], 0.5, abs_tol=0.08) and math.isclose(index[1], 0.81, abs_tol=0.08)):
                     gamepad.right_joystick_float(*stickDirection(index[0], index[1]))
+                else:
+                    gamepad.right_joystick_float(0, 0)
         else:
             gamepad.right_joystick_float(0, 0)
         gamepad.update()
@@ -87,7 +88,7 @@ if __name__ == '__main__':
         results_shared = m.dict()
         rec = multiprocessing.Process(target=screenshot, args=(results_raw, results_shared))
         rec.start()
-        time.sleep(1)
+        time.sleep(3)
         read = multiprocessing.Process(target=readData, args=(results_raw, results_shared))
         read.start()
         rec.join()
