@@ -1,6 +1,5 @@
-import vgamepad as vg
 import time
-from win32api import GetKeyState
+import win32api
 import numpy as np
 import win32gui
 import win32ui
@@ -15,7 +14,7 @@ h = 720  # set this
 model = YOLO("datasets/FromRoboflow/best.pt")
 
 hwnd = None
-hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.677 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
+hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.681 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
 
 
 def screenshot(result_raw, result_shared):
@@ -48,24 +47,38 @@ def screenshot(result_raw, result_shared):
 
         # prediction = model.predict(img, show=False, save=True, save_txt=True)
         prediction = model.predict(img, show=True)
-        result_raw['main'] = prediction
+        # result_raw['main'] = prediction
         # print(prediction[0].boxes.xywhn)
+        readData(prediction, result_shared)
 
 
 def readData(result_raw, result_shared):
-    gamepad = vg.VX360Gamepad()
     while True:
-        print(result_raw['main'][0].boxes.xywhn.tolist())
-        if result_raw['main'][0].boxes.xywhn != []:
-            for index in result_raw['main'][0].boxes.xywhn.tolist():
-                if not (math.isclose(index[0], 0.5, abs_tol=0.08) and math.isclose(index[1], 0.81, abs_tol=0.08)):
-                    gamepad.right_joystick_float(*stickDirection(index[0], index[1]))
-                else:
-                    gamepad.right_joystick_float(0, 0)
-        else:
-            gamepad.right_joystick_float(0, 0)
-        gamepad.update()
+        if is_caps_lock_on():
+            # print(result_raw['main'][0].boxes.xywhn.tolist())
+            if result_raw[0].boxes.xywhn != []:
+                for index in result_raw[0].boxes.xywhn.tolist():
+                    if not (math.isclose(index[0], 0.5, abs_tol=0.08) and math.isclose(index[1], 0.81, abs_tol=0.08)):
+                        keyDirection(index[0], index[1])
+                    else:
+                        print('released-0')
+                        win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)  # I
+                        win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)  # J
+                        win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)  # K
+                        win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)  # L
 
+            time.sleep(0.05)
+            win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)
+            win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)
+            win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)
+            win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)
+        else:
+            print('released-2')
+            win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)
+            win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)
+            win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)
+            win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)
+        break
 
 def stickDirection(player_x, player_y):
     stickx = 0
@@ -78,7 +91,36 @@ def stickDirection(player_x, player_y):
         sticky = 1
     elif 0.02 < player_y - 0.5 < 0.5:
         sticky = -1
-    return stickx, sticky
+
+
+def keyDirection(player_x, player_y):
+    if -0.5 < player_x - 0.5 < -0.02:
+        # print('left')
+        if -0.5 < player_y - 0.5 < -0.02:
+            # print('left-up')
+            win32api.keybd_event(0x49, 0, 0, 0)  # I
+            win32api.keybd_event(0x4A, 0, 0, 0)  # J
+        elif 0.02 < player_y - 0.5 < 0.5:
+            # print('left-down')
+            win32api.keybd_event(0x4A, 0, 0, 0)  # J
+            win32api.keybd_event(0x4B, 0, 0, 0)  # K
+    elif 0.02 < player_x - 0.5 < 0.5:
+        # print('right')
+        if -0.5 < player_y - 0.5 < -0.02:
+            # print('right-up')
+            win32api.keybd_event(0x49, 0, 0, 0)  # I
+            win32api.keybd_event(0x4C, 0, 0, 0)  # L
+        elif 0.02 < player_y - 0.5 < 0.5:
+            # print('right-down')
+            win32api.keybd_event(0x4B, 0, 0, 0)  # K
+            win32api.keybd_event(0x4C, 0, 0, 0)  # L
+
+
+def is_caps_lock_on():
+    # Get the state of the caps lock key
+    state = win32api.GetKeyState(win32con.VK_CAPITAL)
+    # Check if the high-order bit is 1 (caps lock is on)
+    return state & 0x0001 != 0
 
 
 # When everything done, release the capture
@@ -89,7 +131,7 @@ if __name__ == '__main__':
         rec = multiprocessing.Process(target=screenshot, args=(results_raw, results_shared))
         rec.start()
         time.sleep(3)
-        read = multiprocessing.Process(target=readData, args=(results_raw, results_shared))
-        read.start()
+        # read = multiprocessing.Process(target=readData, args=(results_raw, results_shared))
+        # read.start()
         rec.join()
-        read.join()
+        # read.join()
