@@ -8,16 +8,18 @@ import time
 from ultralytics import YOLO
 import multiprocessing
 import math
+import torch_directml
 
 w = 1280  # set this
 h = 720  # set this
+dml = torch_directml.device()
 model = YOLO("datasets/FromRoboflow/best.pt")
 
 hwnd = None
 hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.681 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
 
 
-def screenshot(result_raw, result_shared):
+def screenshot(result_raw):
     t0 = time.time()
     while True:
         wDC = win32gui.GetWindowDC(hwnd)
@@ -47,17 +49,17 @@ def screenshot(result_raw, result_shared):
 
         # prediction = model.predict(img, show=False, save=True, save_txt=True)
         prediction = model.predict(img, show=True)
-        # result_raw['main'] = prediction
+        result_raw['main'] = prediction
         # print(prediction[0].boxes.xywhn)
-        readData(prediction)
+        readData(result_raw)
 
 
 def readData(result_raw):
     while True:
         if is_caps_lock_on():
             # print(result_raw['main'][0].boxes.xywhn.tolist())
-            if result_raw[0].boxes.xywhn != []:
-                for index in result_raw[0].boxes.xywhn.tolist():
+            if result_raw['main'][0].boxes.xywhn != []:
+                for index in result_raw['main'][0].boxes.xywhn.tolist():
                     if not (math.isclose(index[0], 0.5, abs_tol=0.08) and math.isclose(index[1], 0.81, abs_tol=0.08)):
                         keyDirection(index[0], index[1])
                     else:
@@ -115,7 +117,7 @@ def is_caps_lock_on():
 if __name__ == '__main__':
     with multiprocessing.Manager() as m:
         results_raw = m.dict()
-        rec = multiprocessing.Process(target=screenshot, args=results_raw)
+        rec = multiprocessing.Process(target=screenshot, args=(results_raw, ))
         rec.start()
         time.sleep(3)
         # read = multiprocessing.Process(target=readData, args=(results_raw, results_shared))
