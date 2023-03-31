@@ -13,7 +13,7 @@ import torch_directml
 w = 1280  # set this
 h = 720  # set this
 dml = torch_directml.device()
-model = YOLO("datasets/FromRoboflow/best.pt")
+model = YOLO("best.pt")
 
 hwnd = None
 hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.681 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
