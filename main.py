@@ -14,9 +14,10 @@ w = 1280  # set this
 h = 720  # set this
 dml = torch_directml.device()
 model = YOLO("best.pt")
+model.to(dml)
 
 hwnd = None
-hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.681 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
+hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.689 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
 
 
 def screenshot(result_raw):
@@ -48,7 +49,7 @@ def screenshot(result_raw):
         t0 = time.time()
 
         # prediction = model.predict(img, show=False, save=True, save_txt=True)
-        prediction = model.predict(img, show=True)
+        prediction = model.predict(img, show=True, half=True)
         result_raw['main'] = prediction
         # print(prediction[0].boxes.xywhn)
         readData(result_raw)
@@ -76,10 +77,10 @@ def readData(result_raw):
             win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)
         else:
             print('released-2')
-            win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)
-            win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)
-            win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)
-            win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)
+            # win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)
+            # win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)
+            # win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)
+            # win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)
         break
 
 
