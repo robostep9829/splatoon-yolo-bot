@@ -10,35 +10,6 @@ classes = ["player"]
 colors = [[0, 255, 0]]
 
 
-def postprocess(outputs, confidence_threshold=0.5, iou_threshold=0.5):
-    # Extract the bounding boxes, class IDs, and confidence scores from the YOLO model output
-    boxes = []
-    class_ids = [0]
-    scores = []
-    for output in outputs:
-        for detection in output:
-            scores.append(detection[4])
-            # class_ids.append(np.argmax(detection[0:]))
-            class_ids.append(0)
-            box = detection[:4]
-            x, y, w, h = box.astype("int")
-            # print(x, y, w, h)
-            x1, y1, x2, y2 = x - w // 2, y - h // 2, x + w // 2, y + h // 2
-            boxes.append([x1, y1, x2, y2])
-    # Apply non-maximum suppression to the bounding boxes
-    indices = cv2.dnn.NMSBoxes(boxes, scores, confidence_threshold, iou_threshold)
-    # Create a list of the final bounding boxes, class IDs, and confidence scores
-    final_boxes = []
-    final_class_ids = []
-    final_scores = []
-    if len(indices) > 0:
-        for i in indices.flatten():
-            final_boxes.append(boxes[i])
-            final_class_ids.append(class_ids[i])
-            final_scores.append(scores[i])
-    return final_boxes, final_class_ids, final_scores
-
-
 def process(result):
     boxes = []
     scores = []
@@ -46,8 +17,6 @@ def process(result):
         scores.append(result[4][number])
         x, y, w, h = result[0][number], result[1][number], result[2][number], result[3][number]
         x1, y1, x2, y2 = x - w // 2, y - h // 2, x + w // 2, y + h // 2
-        if False:
-            print(x1, y1, x2, y2)
         boxes.append([int(x1), int(y1), int(x2), int(y2)])
     indices = cv2.dnn.NMSBoxes(boxes, scores, 0.4, 0.5)
     final_boxes = []
