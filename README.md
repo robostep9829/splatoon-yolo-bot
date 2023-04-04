@@ -12,4 +12,4 @@ I'm looking for a convinient way to attach it from my roboflow account to this r
 
 ## **Gameplay footage needed**
 
-I'm looking for images with ideally 3 or more players. Content with only one player in lower half of the screen is highly discouraged.
+I'm looking for images with ideally 3 or more players. You can share your gameplay footage in issues. Content with only one player in lower half of the screen is highly discouraged.
