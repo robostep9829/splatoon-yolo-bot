@@ -15,7 +15,7 @@ def process(result):
     scores = []
     for number in range(len(result[0])):
         scores.append(result[4][number])
-        x, y, w, h = result[0][number], result[1][number], result[2][number], result[3][number]
+        x, y, w, h = result[:, number][:4]
         x1, y1, x2, y2 = x - w // 2, y - h // 2, x + w // 2, y + h // 2
         boxes.append([int(x1), int(y1), int(x2), int(y2)])
     indices = cv2.dnn.NMSBoxes(boxes, scores, 0.4, 0.5)

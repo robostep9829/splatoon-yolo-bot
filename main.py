@@ -6,17 +6,14 @@ import win32ui
 import win32con
 import time
 import torch
-from ultralytics import YOLO
 import multiprocessing
 import math
 import dxcam
 import cv2
 import onnxruntime as ort
 
-
 w = 1280  # set this
 h = 720  # set this
-model = YOLO("best.pt")
 
 hwnd = None
 hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.694 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
@@ -29,7 +26,7 @@ session = ort.InferenceSession('best.onnx', providers=['DmlExecutionProvider'])
 
 def screenshot(result_raw):
     while True:
-        image = canvas = cv2.resize(camera.get_latest_frame(), [640, 640])
+        image = cv2.resize(camera.get_latest_frame(), [640, 640])
         image = torch.from_numpy(np.transpose(image, (2, 0, 1)).astype(np.float32))
         image /= 255.0
         image = image.unsqueeze(0)
@@ -43,35 +40,40 @@ def screenshot(result_raw):
 
 def readData(result_raw):
     while True:
-        boxes = []
-        for number in range(0, 8400):
-            if result_raw['main'][4][number] >= 0.45:
-                boxes.append([result_raw['main'][0][number]/640, result_raw['main'][1][number]/640, result_raw['main'][2][number]/640, result_raw['main'][3][number]/640])
+        boxes = result_raw['main']
+        boxes = boxes[:, np.where(boxes[4, :] > 0.5)[0]]
+        # img = np.zeros(shape=[640, 640, 3], dtype=np.uint8)
+        # if boxes.shape[-1] > 0:
+        #    for index in range(boxes.shape[-1]):
+        #        cv2.circle(img, [int(boxes[0, index]), int(boxes[1, index])], int(boxes[2, index]), [255, 0, 0], 4)
+        # cv2.imshow('image', img)
+        # cv2.waitKey(1)
         if is_caps_lock_on():
-            # print(result_raw['main'][0].boxes.xywhn.tolist())
-            if boxes != []:
-                for index in boxes:
-                    print(index)
-                    if not (math.isclose(index[0], 0.5, abs_tol=0.08) and math.isclose(index[1], 0.81, abs_tol=0.08)):
-                        keyDirection(index[0], index[1])
+            if boxes.shape[-1] > 0:
+                for index in range(boxes.shape[-1]):
+                    box = boxes[:4, index] / [640, 640, 640, 640]
+                    if not (math.isclose(box[0], 0.5, abs_tol=0.08) and math.isclose(box[1], 0.81, abs_tol=0.08)):
+                        keyDirection(box[0], box[1])
                     else:
-                        print('released-0')
+                        # print('released-0')
                         win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)  # I
                         win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)  # J
                         win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)  # K
                         win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)  # L
 
-            time.sleep(0.05)
+            time.sleep(0.01)
             win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)
             win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)
             win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)
             win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)
-        else:
-            print('released-2')
-            # win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)
-            # win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)
-            # win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)
-            # win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+        # else:
+        # print('released-2')
+        # win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)
+        # win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)
+        # win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)
+        # win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)
+        # print('done')
 
 
 def keyDirection(player_x, player_y):
@@ -108,10 +110,10 @@ def is_caps_lock_on():
 if __name__ == '__main__':
     with multiprocessing.Manager() as m:
         results_raw = m.dict()
-        rec = multiprocessing.Process(target=screenshot, args=(results_raw, ))
+        rec = multiprocessing.Process(target=screenshot, args=(results_raw,))
         rec.start()
         time.sleep(3)
-        read = multiprocessing.Process(target=readData, args=(results_raw, ))
+        read = multiprocessing.Process(target=readData, args=(results_raw,))
         read.start()
         rec.join()
         read.join()
