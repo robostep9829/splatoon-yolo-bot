@@ -6,11 +6,11 @@ import numpy as np
 import torch
 
 
-def process3(result):
-    boxes, scores = result[:4, :].T.astype(int).tolist(), result[4, :].tolist()
+def process3(results):
+    boxes, scores = results[:4, :].T.astype(int), results[4, :]
     indices = cv2.dnn.NMSBoxes(boxes, scores, 0.4, 0.5)
     if len(indices) > 0:
-        return np.array(boxes)[indices]
+        return boxes[indices]
     else:
         return []
 
