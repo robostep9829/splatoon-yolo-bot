@@ -2,7 +2,6 @@ import time
 import win32api
 import numpy as np
 import win32gui
-import win32ui
 import win32con
 import time
 import torch
@@ -61,7 +60,7 @@ def readData(result_raw):
                         win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)  # K
                         win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0)  # L
 
-            time.sleep(0.01)
+            # time.sleep(0.01)
             win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0)
             win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0)
             win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0)
