@@ -15,7 +15,7 @@ w = 1280  # set this
 h = 720  # set this
 
 hwnd = None
-hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.700 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
+hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.747 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
 left, top, right, bottom = win32gui.GetWindowRect(hwnd)
 
 camera = dxcam.create(output_idx=0, output_color="BGR")
@@ -39,21 +39,21 @@ def screenshot(result_raw):
 def readData(result_raw):
     while True:
         # boxes = result_raw['main']
-        boxes = process3(result_raw['main'])
+        boxes = set(map(tuple,process3(result_raw['main'])))
         img = np.zeros(shape=[640, 640, 3], dtype=np.uint8)
         if len(boxes) > 0:
             for index in boxes:
-                cv2.circle(img, index[:2].astype(int), int(index[2]), [255, 0, 0], 4)
+                cv2.circle(img, (int(index[0]), int(index[1])), int(index[2]), [255, 0, 0], 4)
         cv2.imshow('image', img)
         cv2.waitKey(1)
-        if is_caps_lock_on():
-            if len(boxes) > 0:
-                for index in boxes:
-                    box = index / [640, 640, 640, 640]
-                    # print(box)
-                    if not (math.isclose(box[0], 0.5, abs_tol=0.05) and math.isclose(box[1], 0.73, abs_tol=0.08)):
-                        keyDirection(box[0], box[1], 0.05)
-                time.sleep(0.01)
+        if is_caps_lock_on() and len(boxes) > 0:
+            for index in boxes:
+                # print(index)
+                # box = np.array(index) / [640, 640, 640, 640]
+                # print(box)
+                if not (math.isclose(index[0]/640, 0.5, abs_tol=0.05) and math.isclose(index[1]/640, 0.73, abs_tol=0.08)):
+                    keyDirection(index[0]/640, index[1]/640, 0.05)
+            time.sleep(0.01)
 
 
         # else:
