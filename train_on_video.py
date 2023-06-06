@@ -3,7 +3,6 @@ import cv2
 import numpy
 import numpy as np
 import onnxruntime as ort
-import subprocess
 import shutil
 
 filename = 'Splatoon 3 Online Turf Wars ｜ Livestream [No Commentary] [_kSw_heA4Kk].webm'
@@ -31,12 +30,8 @@ for file in os.listdir('Videos/'+directory):
     boxes = process3(boxes)
     if len(boxes) > 1:
         frames.append(file[:-4])
-        # with open('Videos/frames/txt/'+file[:-4]+'.txt')
-        # print('Videos/frames/txt/'+file[:-4]+'.txt')
         with open('Videos/'+directory+'/txt/'+file[:-4]+'.txt', 'w') as text:
             for index in boxes:
                 result = np.around(numpy.array(index) / [640, 640, 640, 640], decimals=6)
                 text.write(f'0 {" ".join(str(i) for i in result)}\n')
-        #command = ['ffmpeg', '-i', 'Videos/'+filename, '-y', '-vf', f'select=\'eq(n\,{file[:-4]}\')', '-vframes', '1', f"{f'Videos/{directory}/extracted'}/{file[:-4]}.png"]
-        #subprocess.call(command, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         shutil.copy('Videos/'+directory+str(file),'Videos/'+directory+'/'+'extracted/'+str(file))

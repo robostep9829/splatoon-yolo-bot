@@ -9,8 +9,8 @@ import dxcam
 import cv2
 import onnxruntime as ort
 
-w = 1280  # set this
-h = 720  # set this
+w = 1280
+h = 720
 
 hwnd = None
 hwnd = win32gui.FindWindow(None, 'Ryujinx 1.1.869 - Splatoon 2 v5.5.1 (0100F8F0000A2000) (64-bit)')
@@ -27,11 +27,7 @@ def screenshot(result_raw) -> None:
         image = torch.tensor(image.transpose((2, 0, 1)), dtype=torch.float32) / 255.0
         image = image.unsqueeze(0)
 
-        # prediction = model.predict(img, show=False, save=True, save_txt=True)
         result_raw['main'] = session.run(['output0'], {'images': image.numpy()})[0][0]
-        # result_raw['main'] = prediction
-        # print(prediction[0].boxes.xywhn)
-        # readData(result_raw)
 
 
 def readData(result_raw) -> None:
@@ -89,9 +85,7 @@ def keyDirection(player_x: float, player_y: float, sleep: float) -> None:
 
 
 def is_caps_lock_on() -> bool:
-    # Get the state of the caps lock key
     state = win32api.GetKeyState(win32con.VK_CAPITAL)
-    # Check if the high-order bit is 1 (caps lock is on)
     return state & 0x0001 != 0
 
 

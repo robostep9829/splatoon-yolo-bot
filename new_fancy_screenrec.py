@@ -2,7 +2,6 @@ import cv2
 import dxcam
 import win32gui
 import onnxruntime as ort
-import numpy as np
 import torch
 
 
