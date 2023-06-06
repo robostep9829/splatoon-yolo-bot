@@ -120,10 +120,8 @@ def process3(results: np.ndarray) -> np.ndarray:
     indices = cv2.dnn.NMSBoxes(boxes, scores, 0.4, 0.5)
     if len(indices) > 0:
         retval = boxes[indices]
-        index_to_remove = np.argmin(np.linalg.norm(retval[:, :2] - [320, 455], axis=1))
-        retval = np.delete(retval, index_to_remove, axis=0)
-        distances = np.linalg.norm(retval[:, :2] - [320, 320], axis=1)
-        return retval[np.argsort(distances)]
+        retval = np.delete(retval, np.argmin(np.linalg.norm(retval[:, :2] - [320, 455], axis=1)), axis=0)
+        return retval[np.argsort(np.linalg.norm(retval[:, :2] - [320, 320], axis=1))]
     else:
         return []
 
