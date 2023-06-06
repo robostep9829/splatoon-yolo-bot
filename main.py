@@ -1,4 +1,3 @@
-import time
 import win32api
 import numpy as np
 import win32gui
@@ -6,7 +5,6 @@ import win32con
 import time
 import torch
 import multiprocessing
-import math
 import dxcam
 import cv2
 import onnxruntime as ort
@@ -38,8 +36,6 @@ def screenshot(result_raw) -> None:
 
 def readData(result_raw) -> None:
     while True:
-        # boxes = result_raw['main']
-        ## boxes = set(map(tuple, process3(result_raw['main'])))
         boxes = process3(result_raw['main'])
         img = np.zeros(shape=[640, 640, 3], dtype=np.uint8)
         cv2.circle(img, (320, 320), 6, [255, 255, 255], 4)
@@ -53,24 +49,8 @@ def readData(result_raw) -> None:
         cv2.imshow('image', img)
         cv2.waitKey(1)
         if is_caps_lock_on() and len(boxes) > 0:
-            #for index in boxes:
-                # print(index)
-                # box = np.array(index) / [640, 640, 640, 640]
-                # print(box)
-                #if not (math.isclose(index[0]/640, 0.5, abs_tol=0.05) and math.isclose(index[1]/640, 0.73, abs_tol=0.08)):
-                    # keyDirection(index[0]/640, index[1]/640, 0.05)
-                    # continue
             keyDirection(boxes[0][0]/640, boxes[0][1]/640, 0.05)
             time.sleep(0.01)
-
-
-        # else:
-        # print('released-2')
-        # win32api.keybd_event(0x49, 0, win32con.KEYEVENTF_KEYUP, 0) # I
-        # win32api.keybd_event(0x4A, 0, win32con.KEYEVENTF_KEYUP, 0) # J
-        # win32api.keybd_event(0x4B, 0, win32con.KEYEVENTF_KEYUP, 0) # K
-        # win32api.keybd_event(0x4C, 0, win32con.KEYEVENTF_KEYUP, 0) # L
-        # print('done')
 
 
 def keyDirection(player_x: float, player_y: float, sleep: float) -> None:
@@ -123,7 +103,7 @@ def process3(results: np.ndarray) -> np.ndarray:
         retval = np.delete(retval, np.argmin(np.linalg.norm(retval[:, :2] - [320, 455], axis=1)), axis=0)
         return retval[np.argsort(np.linalg.norm(retval[:, :2] - [320, 320], axis=1))]
     else:
-        return []
+        return np.empty((0, 0))
 
 
 # When everything done, release the capture
