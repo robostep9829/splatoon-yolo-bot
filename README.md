@@ -6,9 +6,9 @@ The bot uses a pre-trained model to predict the player's location on screen and 
 
 The bot is built using Python and uses libraries such as [dxcam](https://github.com/ra1nty/DXcam), [OpenCV](https://pypi.org/project/opencv-python/), and [onnxruntime](https://pypi.org/project/onnxruntime-directml/). The code is designed to run on the Windows operating system and has been tested with Splatoon 2 version ```5.5.1```.
 
-I can share the dataset if you insist.
-
-I'm looking for a convinient way to attach it from my roboflow account to this repo.
+<a href="https://universe.roboflow.com/robostep9829/splatoon-bot">
+    <img src="https://app.roboflow.com/images/download-dataset-badge.svg"></img>
+</a>
 
 ## **Gameplay footage needed**
 
